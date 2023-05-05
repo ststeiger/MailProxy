@@ -29,8 +29,7 @@ namespace MailProxy
 
             string hexData = MailProxy.ByteHelper.ByteArrayToHexViaLookup32(raw);
 
-
-            bool stringEscapedJson = true;
+            bool stringEscapedJson = false;
 
             if(stringEscapedJson)
                 text = text.Replace(@"\", @"\\");
