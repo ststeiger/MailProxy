@@ -13,6 +13,8 @@ namespace NetProxy
 {
     internal class TcpProxy : IProxy
     {
+
+
         /// <summary>
         /// Milliseconds
         /// </summary>
@@ -21,6 +23,7 @@ namespace NetProxy
         public async Task Start(string remoteServerHostNameOrAddress, ushort remoteServerPort, ushort localPort, string? localIp)
         {
             var connections = new ConcurrentBag<TcpConnection>();
+            LogHelper
 
             IPAddress localIpAddress = string.IsNullOrEmpty(localIp) ? IPAddress.IPv6Any : IPAddress.Parse(localIp);
             var localServer = new TcpListener(new IPEndPoint(localIpAddress, localPort));
@@ -163,7 +166,8 @@ namespace NetProxy
                     Console.WriteLine($"Closed TCP {_sourceEndpoint} => {_serverLocalEndpoint} => {_forwardLocalEndpoint} => {_remoteEndpoint}. {_totalBytesForwarded} bytes forwarded, {_totalBytesResponded} bytes responded.");
                 }
             });
-        }
+        } // End Sub RunInternal 
+
 
         private async Task CopyToAsync(Stream source, Stream destination, int bufferSize = 81920, Direction direction = Direction.Unknown, CancellationToken cancellationToken = default)
         {
@@ -173,11 +177,14 @@ namespace NetProxy
                 while (true)
                 {
                     int bytesRead = await source.ReadAsync(new Memory<byte>(buffer), cancellationToken).ConfigureAwait(false);
-                    if (bytesRead == 0) break;
+                    if (bytesRead == 0) 
+                        break;
+
                     LastActivity = Environment.TickCount64;
 
                     bool s_isWindows = true;
                     string text = System.Text.Encoding.UTF8.GetString(buffer.AsSpan(0, bytesRead));
+                    string hexData = MailProxy.ByteHelper.ByteArrayToHexViaLookup32(buffer.AsSpan(0, bytesRead));
 
                     string eventCaption = "Server";
                     System.Drawing.Color backgroundColor = System.Drawing.Color.Green;
@@ -187,12 +194,13 @@ namespace NetProxy
                         eventCaption = "Client";
                         backgroundColor = System.Drawing.Color.Blue;
                         foregroundColor = System.Drawing.Color.White;
-                    }
+                    } // End if (direction == Direction.Forward) 
 
 
                     System.Console.ResetColor();
                     System.Console.Write(eventCaption + ":");
                     System.Console.Write(new string(' ', System.Console.BufferWidth - System.Console.CursorLeft));
+
 
                     if (!s_isWindows)
                         System.Console.Write(System.Environment.NewLine);
@@ -206,10 +214,14 @@ namespace NetProxy
                     {
                         cw.BackColor = backgroundColor;
                         cw.Append(text + System.Environment.NewLine);
+                        System.IO.File.AppendAllText(TcpProxy.LogFile, text + System.Environment.NewLine, System.Text.Encoding.UTF8);
+
+                        // hexData
+
+                        // System.IO.File.AppendAllText(TcpProxy.LogFile, "{", System.Text.Encoding.UTF8);
+                        System.IO.File.AppendAllText(TcpProxy.LogFile, eventCaption + ":" + System.Environment.NewLine, System.Text.Encoding.UTF8);
+                        // System.IO.File.AppendAllText(TcpProxy.LogFile, "}", System.Text.Encoding.UTF8);
                     }
-
-
-
 
                     await destination.WriteAsync(new ReadOnlyMemory<byte>(buffer, 0, bytesRead), cancellationToken).ConfigureAwait(false);
 
