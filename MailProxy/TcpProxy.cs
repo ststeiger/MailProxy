@@ -23,7 +23,8 @@ namespace NetProxy
         public async Task Start(string remoteServerHostNameOrAddress, ushort remoteServerPort, ushort localPort, string? localIp)
         {
             var connections = new ConcurrentBag<TcpConnection>();
-            LogHelper
+
+            MailProxy.LogHelper.StartLog();
 
             IPAddress localIpAddress = string.IsNullOrEmpty(localIp) ? IPAddress.IPv6Any : IPAddress.Parse(localIp);
             var localServer = new TcpListener(new IPEndPoint(localIpAddress, localPort));
@@ -184,7 +185,7 @@ namespace NetProxy
 
                     bool s_isWindows = true;
                     string text = System.Text.Encoding.UTF8.GetString(buffer.AsSpan(0, bytesRead));
-                    string hexData = MailProxy.ByteHelper.ByteArrayToHexViaLookup32(buffer.AsSpan(0, bytesRead));
+                    
 
                     string eventCaption = "Server";
                     System.Drawing.Color backgroundColor = System.Drawing.Color.Green;
@@ -214,13 +215,7 @@ namespace NetProxy
                     {
                         cw.BackColor = backgroundColor;
                         cw.Append(text + System.Environment.NewLine);
-                        System.IO.File.AppendAllText(TcpProxy.LogFile, text + System.Environment.NewLine, System.Text.Encoding.UTF8);
-
-                        // hexData
-
-                        // System.IO.File.AppendAllText(TcpProxy.LogFile, "{", System.Text.Encoding.UTF8);
-                        System.IO.File.AppendAllText(TcpProxy.LogFile, eventCaption + ":" + System.Environment.NewLine, System.Text.Encoding.UTF8);
-                        // System.IO.File.AppendAllText(TcpProxy.LogFile, "}", System.Text.Encoding.UTF8);
+                        MailProxy.LogHelper.LogLine(eventCaption, buffer.AsSpan(0, bytesRead), text);
                     }
 
                     await destination.WriteAsync(new ReadOnlyMemory<byte>(buffer, 0, bytesRead), cancellationToken).ConfigureAwait(false);
