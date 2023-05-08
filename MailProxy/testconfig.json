@@ -1,0 +1,14 @@
+﻿{
+  "IMAP": {
+    "localPort": 243,
+    "protocol": "tcp",
+    "forwardIp": "127.0.0.1",
+    "forwardPort": 143
+  },
+  "POP3": {
+    "localPort": 210,
+    "protocol": "tcp",
+    "forwardIp": "127.0.0.1",
+    "forwardPort": 110
+  }
+}
