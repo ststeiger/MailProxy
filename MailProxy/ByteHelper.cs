@@ -2,14 +2,21 @@
 namespace MailProxy
 {
 
+
     public static class LogHelper
     {
-
-        private static string JsonLogFile = "messageLog.json";
-        private static string LogFile = "messageLog.txt";
+        private static bool hasNotStarted = true;
 
 
-       private static bool hasNotStarted = true;
+        private static readonly string JsonLogFile;
+        private static readonly string LogFile;
+
+
+        static LogHelper()
+        {
+            JsonLogFile = "messageLog.json";
+            LogFile = "messageLog.txt";
+        }
 
 
         public static void StartLog()
@@ -18,7 +25,7 @@ namespace MailProxy
                 System.IO.File.AppendAllText(JsonLogFile, "[" + System.Environment.NewLine, System.Text.Encoding.UTF8);
             
             hasNotStarted = false;
-        }
+        } // End Sub StartLog 
 
 
         // MailProxy.LogHelper.LogLine(who, raw, "hell");
@@ -45,17 +52,16 @@ namespace MailProxy
             System.IO.File.AppendAllText(JsonLogFile, "\"text\": " + System.Web.HttpUtility.JavaScriptStringEncode(text, true) + "," + System.Environment.NewLine, System.Text.Encoding.UTF8);
             System.IO.File.AppendAllText(JsonLogFile, "\"byte\": " + System.Web.HttpUtility.JavaScriptStringEncode(hexData, true) + System.Environment.NewLine, System.Text.Encoding.UTF8);
             System.IO.File.AppendAllText(JsonLogFile, "}," + System.Environment.NewLine, System.Text.Encoding.UTF8);
-
-
-            
-        }
+        } // End Sub LogLine 
 
 
         public static void EndLog()
         {
             System.IO.File.AppendAllText(JsonLogFile, System.Environment.NewLine+"]" + System.Environment.NewLine, System.Text.Encoding.UTF8);
-        }
-    }
+        } // End Sub EndLog 
+
+
+    } // End Class LogHelper 
 
 
 
@@ -75,13 +81,13 @@ namespace MailProxy
                 result[i] = ((uint)s[0]) + ((uint)s[1] << 16);
             }
             return result;
-        }
+        } // End Static Function CreateLookup32 
 
 
         static ByteHelper()
         {
             _lookup32 = CreateLookup32();
-        }
+        } // End constructor 
 
 
         // ByteHelper.ByteArrayToHexViaLookup32
@@ -97,7 +103,7 @@ namespace MailProxy
             }
 
             return new string(result);
-        }
+        } // End Function ByteArrayToHexViaLookup32 
 
 
         // ByteHelper.ByteArrayToHexViaLookup32
@@ -110,12 +116,13 @@ namespace MailProxy
                 uint val = lookup32[bytes[i]];
                 result[2 * i] = (char)val;
                 result[2 * i + 1] = (char)(val >> 16);
-            }
+            } // Next i 
 
             return new string(result);
-        }
+        } // End Function ByteArrayToHexViaLookup32 
 
 
+    } // End Class LogHelper 
 
-    }
-}
+
+} // End Namespace MailProxy 
