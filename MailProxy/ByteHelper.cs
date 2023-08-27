@@ -12,10 +12,19 @@ namespace MailProxy
         private static readonly string LogFile;
 
 
+        private static void DeleteFileIfExists(string fileName)
+        {
+            if (System.IO.File.Exists(fileName))
+                System.IO.File.Delete(fileName);
+        }
+
         static LogHelper()
         {
             JsonLogFile = "messageLog.json";
             LogFile = "messageLog.txt";
+
+            DeleteFileIfExists(JsonLogFile);
+            DeleteFileIfExists(LogFile);
         }
 
 
